@@ -1,0 +1,1 @@
+{"t_a1":{"test":{"NoSQL":{"a2":"1"},"database_i":0,"row_i":0,"table_i":0,"type":{"a1":["INT","","","NULL",""],"a2":["VARCHAR","255","","NULL","1"],"created_at":["TIMESTAMP","","","DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'",""],"updated_at":["TIMESTAMP","","","ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'",""]}}}}
