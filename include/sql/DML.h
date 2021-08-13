@@ -19,7 +19,7 @@ namespace bb {
             std::string where_key_ = "*";
             std::array<std::string,2> where_sql_={"",""};
         public:
-            explicit DML(DDL *connect_a) : connect_(connect_a) {}
+            explicit DML(DDL *connect_a);
 
             //切换并创建库,连接库不存在时创建并连接(库名最多64个字符)
             void useDatabase(const std::string &name);

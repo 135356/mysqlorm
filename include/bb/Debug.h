@@ -5,6 +5,9 @@
 #ifndef BB_DB_DEBUG_H
 #define BB_DB_DEBUG_H
 
+#include <string>
+#include <exception>
+
 namespace bb {
     class Debug:public std::exception{
     public:
@@ -27,7 +30,8 @@ namespace bb {
 }
 
 #endif //BB_DB_DEBUG_H
-/*
+
+/*示例
 try{
     throw bb::ErrSql(1000);
 }catch(bb::ErrSql &err){

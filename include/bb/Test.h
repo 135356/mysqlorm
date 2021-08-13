@@ -11,14 +11,18 @@
 namespace bb{
     class Test {
     public:
-        //返回值类型为clock_t(以内部处理器时间为计量单位的，所以必须把它除以时钟频率，得到以秒为单位的时间)
-        //处理器内部时间频率的常量:(Linux为:CLOCKS_PER_SEC)、(W系统为:CLK_TCK)
-        static void speed1(void (* aF)());
+        static void speed_old(void (* aF)());
         //精度更高，#include <chrono>
         static void speed(void (* aF)());
 
         template<class T1>
-        static void speed(void (* aF)(T1 &a_a),T1 &a_a);
+        static void speed(void (* aF)(T1 &a_a),T1 &a_a){
+            auto start = std::chrono::system_clock::now();
+            aF(a_a);
+            auto end = std::chrono::system_clock::now();
+            auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+            std::cout<<"花费了"<<double(duration.count()) * std::chrono::microseconds::period::num / std::chrono::microseconds::period::den<<"秒"<<std::endl;
+        }
     };
 }
 

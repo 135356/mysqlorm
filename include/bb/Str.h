@@ -29,7 +29,6 @@ namespace bb{
         static std::string delimiter_(std::string &str);
         static std::string delimiter_(std::string &str,const char &middle_en);
         static std::string delimiter_(std::string &str,const char &middle_en,const char &end_en);
-
         //char字符串拼接
         static char *splice(char *c_str,char *c_str1);
     };

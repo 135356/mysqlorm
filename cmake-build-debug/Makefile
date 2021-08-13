@@ -57,10 +57,10 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /tmp/tmp.UjDTe1IRNN
+CMAKE_SOURCE_DIR = /tmp/tmp.MD4j2hYuRy
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /tmp/tmp.UjDTe1IRNN/cmake-build-debug
+CMAKE_BINARY_DIR = /tmp/tmp.MD4j2hYuRy/cmake-build-debug
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -87,9 +87,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/tmp.UjDTe1IRNN/cmake-build-debug/CMakeFiles /tmp/tmp.UjDTe1IRNN/cmake-build-debug//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/tmp.MD4j2hYuRy/cmake-build-debug/CMakeFiles /tmp/tmp.MD4j2hYuRy/cmake-build-debug//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/tmp.UjDTe1IRNN/cmake-build-debug/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /tmp/tmp.MD4j2hYuRy/cmake-build-debug/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -115,19 +115,6 @@ preinstall/fast:
 depend:
 	$(CMAKE_COMMAND) -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR) --check-build-system CMakeFiles/Makefile.cmake 1
 .PHONY : depend
-
-#=============================================================================
-# Target rules for targets named BB_DB
-
-# Build rule for target.
-BB_DB: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BB_DB
-.PHONY : BB_DB
-
-# fast build rule for target.
-BB_DB/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/build
-.PHONY : BB_DB/fast
 
 #=============================================================================
 # Target rules for targets named BB_DB_main
@@ -166,126 +153,6 @@ main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB_main.dir/build.make CMakeFiles/BB_DB_main.dir/main.cpp.s
 .PHONY : main.cpp.s
 
-src/mode/TA1_Test.o: src/mode/TA1_Test.cpp.o
-.PHONY : src/mode/TA1_Test.o
-
-# target to build an object file
-src/mode/TA1_Test.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/mode/TA1_Test.cpp.o
-.PHONY : src/mode/TA1_Test.cpp.o
-
-src/mode/TA1_Test.i: src/mode/TA1_Test.cpp.i
-.PHONY : src/mode/TA1_Test.i
-
-# target to preprocess a source file
-src/mode/TA1_Test.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/mode/TA1_Test.cpp.i
-.PHONY : src/mode/TA1_Test.cpp.i
-
-src/mode/TA1_Test.s: src/mode/TA1_Test.cpp.s
-.PHONY : src/mode/TA1_Test.s
-
-# target to generate assembly for a file
-src/mode/TA1_Test.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/mode/TA1_Test.cpp.s
-.PHONY : src/mode/TA1_Test.cpp.s
-
-src/sql/DDL.o: src/sql/DDL.cpp.o
-.PHONY : src/sql/DDL.o
-
-# target to build an object file
-src/sql/DDL.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DDL.cpp.o
-.PHONY : src/sql/DDL.cpp.o
-
-src/sql/DDL.i: src/sql/DDL.cpp.i
-.PHONY : src/sql/DDL.i
-
-# target to preprocess a source file
-src/sql/DDL.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DDL.cpp.i
-.PHONY : src/sql/DDL.cpp.i
-
-src/sql/DDL.s: src/sql/DDL.cpp.s
-.PHONY : src/sql/DDL.s
-
-# target to generate assembly for a file
-src/sql/DDL.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DDL.cpp.s
-.PHONY : src/sql/DDL.cpp.s
-
-src/sql/DML.o: src/sql/DML.cpp.o
-.PHONY : src/sql/DML.o
-
-# target to build an object file
-src/sql/DML.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DML.cpp.o
-.PHONY : src/sql/DML.cpp.o
-
-src/sql/DML.i: src/sql/DML.cpp.i
-.PHONY : src/sql/DML.i
-
-# target to preprocess a source file
-src/sql/DML.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DML.cpp.i
-.PHONY : src/sql/DML.cpp.i
-
-src/sql/DML.s: src/sql/DML.cpp.s
-.PHONY : src/sql/DML.s
-
-# target to generate assembly for a file
-src/sql/DML.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DML.cpp.s
-.PHONY : src/sql/DML.cpp.s
-
-src/sql/DQL.o: src/sql/DQL.cpp.o
-.PHONY : src/sql/DQL.o
-
-# target to build an object file
-src/sql/DQL.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DQL.cpp.o
-.PHONY : src/sql/DQL.cpp.o
-
-src/sql/DQL.i: src/sql/DQL.cpp.i
-.PHONY : src/sql/DQL.i
-
-# target to preprocess a source file
-src/sql/DQL.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DQL.cpp.i
-.PHONY : src/sql/DQL.cpp.i
-
-src/sql/DQL.s: src/sql/DQL.cpp.s
-.PHONY : src/sql/DQL.s
-
-# target to generate assembly for a file
-src/sql/DQL.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/DQL.cpp.s
-.PHONY : src/sql/DQL.cpp.s
-
-src/sql/Type.o: src/sql/Type.cpp.o
-.PHONY : src/sql/Type.o
-
-# target to build an object file
-src/sql/Type.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/Type.cpp.o
-.PHONY : src/sql/Type.cpp.o
-
-src/sql/Type.i: src/sql/Type.cpp.i
-.PHONY : src/sql/Type.i
-
-# target to preprocess a source file
-src/sql/Type.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/Type.cpp.i
-.PHONY : src/sql/Type.cpp.i
-
-src/sql/Type.s: src/sql/Type.cpp.s
-.PHONY : src/sql/Type.s
-
-# target to generate assembly for a file
-src/sql/Type.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BB_DB.dir/build.make CMakeFiles/BB_DB.dir/src/sql/Type.cpp.s
-.PHONY : src/sql/Type.cpp.s
-
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -294,26 +161,10 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... BB_DB"
 	@echo "... BB_DB_main"
 	@echo "... main.o"
 	@echo "... main.i"
 	@echo "... main.s"
-	@echo "... src/mode/TA1_Test.o"
-	@echo "... src/mode/TA1_Test.i"
-	@echo "... src/mode/TA1_Test.s"
-	@echo "... src/sql/DDL.o"
-	@echo "... src/sql/DDL.i"
-	@echo "... src/sql/DDL.s"
-	@echo "... src/sql/DML.o"
-	@echo "... src/sql/DML.i"
-	@echo "... src/sql/DML.s"
-	@echo "... src/sql/DQL.o"
-	@echo "... src/sql/DQL.i"
-	@echo "... src/sql/DQL.s"
-	@echo "... src/sql/Type.o"
-	@echo "... src/sql/Type.i"
-	@echo "... src/sql/Type.s"
 .PHONY : help
 
 
