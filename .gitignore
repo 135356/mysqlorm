@@ -31,11 +31,3 @@
 *.app
 
 .idea
-cmake-build-debug/CMakeFiles
-cmake-build-debug/Testing
-cmake-build-debug/*.cbp
-cmake-build-debug/*.exe
-cmake-build-debug/*.lik
-cmake-build-debug/*.pdb
-cmake-build-debug/*.lib
-cmake-build-debug/*.dll
