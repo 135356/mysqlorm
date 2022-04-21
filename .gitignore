@@ -12,6 +12,7 @@
 *.pch
 
 # Compiled Dynamic libraries
+*.so
 *.dylib
 *.dll
 
@@ -30,4 +31,8 @@
 *.out
 *.app
 
+# custom
+.DS_Store
+*.code-workspace
 .idea
+cmake-build-debug
