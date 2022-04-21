@@ -1,14 +1,14 @@
-cmake_minimum_required(VERSION 3.17)
-project(BB_DB)
+cmake_minimum_required(VERSION 3.21)
+project(MysqlOrm)
 
 set(CMAKE_CXX_STANDARD 14)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/build/lib)
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR}/build)
 
-link_directories("./cmake-build-debug/lib")
-
-add_executable(BB_DB_main main.cpp)
+add_executable(main main.cpp)
 
 include_directories("include")
-target_link_libraries(BB_DB_main mysqlclient)
-target_link_libraries(BB_DB_main hiredis)
-target_link_libraries(BB_DB_main bb)
-target_link_libraries(BB_DB_main BB_DB)
+find_library(bb bb ${CMAKE_BINARY_DIR}/build/lib)
+find_library(mysqlclient mysqlclient ${CMAKE_BINARY_DIR}/build/lib)
+find_library(MysqlOrm MysqlOrm ${CMAKE_BINARY_DIR}/build/lib)
+target_link_libraries(main ${bb} ${mysqlclient} ${MysqlOrm})
