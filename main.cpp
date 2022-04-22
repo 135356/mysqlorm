@@ -3,8 +3,8 @@
 
 int main() {
     dql a;
-    a.useDatabase("aaaaaa");
+    a.useDatabase("aaaaaaa");
     a.useTable("aaa");
-    a.where("id",">",0)->show();
+    a.where("id",">","0")->show();
     return 0;
 }
