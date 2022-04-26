@@ -15,10 +15,11 @@ struct PageData{
     unsigned long total_page{}; //总页
 };
 class dql:public dml{
-    Debug debug{};
     unsigned index_{}; //负载均衡下标(不会被其它用户的构造影响)
     std::string where_key_ = "*";
     std::array<std::string,2> where_sql_={"",""};
+protected:
+    Debug debug{};
 public:
     PageData page_data_; //翻页信息
     std::vector<std::map<std::string,std::string>> data_; //查询到的数据
@@ -90,6 +91,11 @@ public:
 
     //用于查看执行了多少次
     int explain();
+
+    //判断数据库是否存在
+    int isDB(const std::string &name);
+    //判断数据表是否存在
+    int isTable(const std::string &name);
 };
 
 #endif //MYSQLORM_DQL_H

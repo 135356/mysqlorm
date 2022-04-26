@@ -16,7 +16,7 @@ class Debug{
     //写日记
     void writeDiary();
 public:
-    explicit Debug(std::string bug_path={});
+    explicit Debug(std::string file_path={});
     ~Debug();
 public:
     //一般信息

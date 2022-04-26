@@ -13,27 +13,27 @@ class dml:public dml_type{
     Debug debug{};
     std::array<std::string,2> where_sql_={"",""};
 protected:
-    std::string database_name_; //库名称
+    std::string DB_name_; //库名称
     std::string table_name_; //表名称
 public:
     dml();
     //向mysql发送数据
-    int query(const std::string &sql);
+    int query_(const std::string &sql);
 public:
     //切换并创建库,连接库不存在时创建并连接(库名最多64个字符)
-    int useDatabase(const std::string &name);
+    int useDB(const std::string &name);
 
     //创建库，库名最多64-10个字符
-    int createDatabase(const std::string &name);
+    int createDB(const std::string &name);
 
     //改库名称
-    int upDatabase(const std::string &old_name, const std::string &new_name);
+    int upDB(const std::string &old_name, const std::string &new_name);
 
     //删除库
-    int delDatabase(const std::string &name);
+    int delDB(const std::string &name);
 
     //切换表
-    void useTable(const std::string &name);
+    int useTable(const std::string &name);
 
     //创建表，表名最大64-10个字符，crud.createTable([](auto *data){data->int_("a12")->nullable_()->comment_("这是a1");})
     int createTable(const std::string &name, void (*createF)(dml *));

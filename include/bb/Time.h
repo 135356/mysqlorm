@@ -1,9 +1,9 @@
 //
-// Created by cc on 2021/9/27.
+// Created by 邦邦 on 2022/4/22.
 //
 
-#ifndef UDPSERVER_TIME_H
-#define UDPSERVER_TIME_H
+#ifndef BB_TIME_H
+#define BB_TIME_H
 #include <thread>
 
 namespace bb{
@@ -78,5 +78,4 @@ namespace bb{
         }
     };
 }
-
-#endif //UDPSERVER_TIME_H
+#endif //BB_TIME_H

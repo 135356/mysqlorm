@@ -15,7 +15,7 @@ class ddl{
     Debug debug;
     FILE *fp_{};
     ddl();
-    ~ddl(){fclose(fp_);}
+    ~ddl();
 public:
     std::vector<MYSQL> connect{}; //mysql的tcp连接
     unsigned dql_index{}; //负载均衡下标,轮询切换服务器,只有DQL需要切换只在new的时候切换(同一个用户不进行切换)

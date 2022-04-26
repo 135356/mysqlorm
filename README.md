@@ -38,27 +38,34 @@
 
 
 ### 头文件 `include "sql/dql.h"`
+
+### 直接向mysql发送sql语句
+```c++
+int query_(const std::string &sql)
+    参数：sql 语句如:show databases;
+    返回值：成功返回0，失败返回-1
+```
 ### 切换数据库(在对数据库操作之前用该方法切换)
 ```c++
-int useDatabase(const std::string &name)
+int useDB(const std::string &name)
     参数：name 数据表的名称
     返回值：成功返回0，失败返回-1
 ```
 ### 切换数据表(在对数据表操作之前用该方法切换)
 ````c++
-void useTable(const std::string &name)
+int useTable(const std::string &name)
     参数：name 数据表名称
     返回值：成功返回0，失败返回-1
 ````
 ### 创建数据库
 ````c++
-int createDatabase(const std::string &name);
+int createDB(const std::string &name);
     参数：name 数据库名称
     返回值：成功返回0，失败返回-1
 ````
 ### 改数据库名称
 ````c++
-int upDatabase(const std::string &old_name, const std::string &new_name)
+int upDB(const std::string &old_name, const std::string &new_name)
     参数：
         old_name 原来的数据库名称
         new_name 要修改新的数据库名称
@@ -66,7 +73,7 @@ int upDatabase(const std::string &old_name, const std::string &new_name)
 ````
 ### 删除数据库
 ````c++
-int delDatabase(const std::string &name)
+int delDB(const std::string &name)
     参数：name 数据库名称
     返回值：成功返回0，失败返回-1
 ````
@@ -115,7 +122,7 @@ int createTable(const std::string &name, void (*createF)(dml *));
         
         dql a;
         //进入到数据库aaaaaa(接下来的操作都是基于这个数据库的)
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         //创建数据表aaa
         a.createTable("aaa",[](auto *data){
             data->tinyint_("a1")->unsigned_()->unique_()->nullable_()->default_("123")->zerofill_()->comment_("这是a1");
@@ -178,7 +185,7 @@ int addCol(void (*createF)(dml *))
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         //进入到数据表aaa(接下来的操作都是基于这个数据表的)
         a.useTable("aaa");
         //追加a100字段，字段类型int，允许为null，注释内容为"这是a100"
@@ -195,7 +202,7 @@ int upColName(const std::string &old_key, void (*createF)(dml *))
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //将a1字段改为a100，字段类型int，允许为null，注释内容为"这是a100"
         a.updateCol("a1",[](auto *data){
@@ -209,7 +216,7 @@ int upColType(void (*createF)(dml *))
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //修改a1字段的类型为int，允许为null，注释内容为"这是a1"
         a.updateType([](auto *data){
@@ -249,7 +256,7 @@ int insert(const std::vector<std::array<std::string, 2>> &data)
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //插入a1字段的值为1,a2字段的值为2,a3字段的值为3
         a.create({{"a1","1"},{"a2","2"},{"a3","3"}});
@@ -263,7 +270,7 @@ int insert(const std::vector<std::string> &key,const std::vector<std::vector<std
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //将对a1、a2、a3字段进行插入，内容分别是1、2、3与21、22、23
         dml.create({"a1","a2","a3"},{{"1","2","3"},{"21","22","23"}});
@@ -275,7 +282,7 @@ int update(const std::vector<std::array<std::string, 2>> &data)
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //查找a1=aa的那一条数据，内容修改为:a2=bb，a3=cc
         dql.where("a1","aa")->update({{"a2","456"},{"a3","666"}});
@@ -286,7 +293,7 @@ int del()
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //查找a1=aa的那一条数据 删除掉
         dql.where("a1","aa")->del();
@@ -304,7 +311,7 @@ int show_()
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //比如使用get_这个方法输入sql语句"select * from aaa"查找数据，然后通过show_将get_到的数据显示出来
         a.get_("select * from aaa")->show_();
@@ -317,7 +324,7 @@ dql *selectArr(const std::vector<std::string> &key)
     返回值：返回一个指向自己的指针，可用于拼接如:update等功能
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //只要a1字段的内容，寻找a1大于0的数据，显示出来
         a.select("a1")->where("a1",">","0")->show();
@@ -331,7 +338,7 @@ dql *find(const unsigned long &id = 1)
     返回值：返回一个指向自己的指针，可用于拼接如:update等功能
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //寻找id等于1的数据，显示出来
         a.find(1)->show();
@@ -346,7 +353,7 @@ dql *where(const std::string &key, const double &value)
     返回值：返回一个指向自己的指针，可用于拼接如:update等功能
     示例:
         dql a;
-        a.useDatabase("aaaaaa");
+        a.useDB("aaaaaa");
         a.useTable("aaa");
         //寻找a1等于aa的数据，进行删除
         a.where("a1","aa")->del();
@@ -423,3 +430,15 @@ int showIndex()
 ````c++
 int explain()
 ````
+### 判断数据库是否存在
+```c++
+int isDB(const std::string &name);
+    参数：name 数据库的名称
+    返回值：发生错误返回-1，不存在返回0，存在返回1
+```
+### 判断数据表是否存在
+```c++
+int isTable(const std::string &name);
+    参数：name 数据表的名称
+    返回值：发生错误返回-1，不存在返回0，存在返回1
+```

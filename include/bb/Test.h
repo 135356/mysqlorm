@@ -1,5 +1,5 @@
 //
-// Created by cc on 2021/2/25.
+// Created by 邦邦 on 2022/4/22.
 //
 
 #ifndef BB_TEST_H
@@ -25,26 +25,4 @@ namespace bb{
         }
     };
 }
-
 #endif //BB_TEST_H
-
-/*
-示例:
-    #include <string>
-    #include <vector>
-    #include "test/Test.cpp"
-    Test::speed([]{
-        unsigned size = 10000000;
-        std::vector<Elem3> obj(size);
-        for(int i=0;i<size;i++){
-            obj.push_back(*Elem3::insert_("name"+std::to_string(i),"a","b"));
-        }
-    });
-    Test::speed([]{
-        unsigned size = 10000000;
-        std::vector<Elem3> obj(size);
-        for(int i=0;i<size;i++){
-            obj.push_back(*Elem3::insert("name"+std::to_string(i),"a","b"));
-        }
-    });
-*/
