@@ -442,3 +442,66 @@ int isTable(const std::string &name);
     参数：name 数据表的名称
     返回值：发生错误返回-1，不存在返回0，存在返回1
 ```
+====
+### mode
+> 继承dql(拥有它的所有方法)，以类名称创建数据库与数据表，通过mode类对mysql对应的数据库与数据表进行: 增、删、改、查  
+> 下划线区分: 数据库_数据表  
+> 大写字母将转成下划线，如: dbA1_tableTest将转换成: 【数据库：db_a1 与 数据表：table_test】  
+> 示例文件位置: ./include/sql/mode/dbA1_test.hpp
+#### 示例(dbA1_test.hpp):
+```c++
+#include "sql/dql.h"
+
+class dbA1_test:public dql{
+public:
+    dbA1_test(){
+        if(run_() != 0){
+            debug.error("mode创建的时候出现问题");
+        }
+        update_();
+    }
+protected:
+    int run_(){
+        std::array<std::string,2> obj_info = getName_();
+        DB_name_ = obj_info[0];
+        table_name_ = obj_info[1];
+        if(createDB(DB_name_) == 0 && useDB(DB_name_) == 0){
+            if(isTable(table_name_) == 0){
+                if(create_() != 0){return -1;}
+            }
+            return useTable(table_name_);
+        }
+        return 0;
+    }
+    int create_(){
+        return createTable(table_name_,[](auto *data){
+            data->int_("a1")->default_(123)->comment_("注释");
+            data->string_("a2")->nullable_();
+            data->dateAt_();
+        });
+    }
+    void update_(){
+        //改列类型
+        upColType([](auto *data){
+            data->bigint_("a1")->nullable_();
+        });
+        //追加列
+        addCol([](auto *data){
+            data->int_("a3");
+        });
+    }
+};
+```
+#### 示例(main.cpp):
+```c++
+#include "sql/mode/dbA1_test.hpp"
+
+int main() {
+    //对象a就代表db_a1数据库的test数据表
+    dbA1_test a;
+    //如: 对db_a1数据库的test数据表 进行插入数据与查看数据的操作
+    a.insert({{"a1","123"},{"a2","abc"}});
+    a.where("id",">","0")->show();
+    return 0;
+}
+```
