@@ -5,9 +5,9 @@
 #ifndef MYSQLORM_DBA1_TEST_HPP
 #define MYSQLORM_DBA1_TEST_HPP
 
-#include "../dql.h"
+#include "mysql_orm/sql/dql.h"
 
-class dbA1_test:public dql{
+class dbA1_test:public bb::dql{
 public:
     dbA1_test(){
         if(run_() != 0){

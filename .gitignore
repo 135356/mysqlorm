@@ -36,3 +36,4 @@
 *.code-workspace
 .idea
 cmake-build-debug
+build
