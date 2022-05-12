@@ -37,7 +37,7 @@
 > ```
 
 
-### 头文件 `include "sql/dql.h"`
+### 头文件 `#include "mysql_orm/mode/dbA1_test.hpp"`
 
 ### 直接向mysql发送sql语句
 ```c++
@@ -45,10 +45,22 @@ int query_(const std::string &sql)
     参数：sql 语句如:show databases;
     返回值：成功返回0，失败返回-1
 ```
+### 判断数据库是否存在
+```c++
+int isDB(const std::string &name);
+    参数：name 数据库的名称
+    返回值：发生错误返回-1，不存在返回0，存在返回1
+```
+### 判断数据表是否存在
+```c++
+int isTable(const std::string &name);
+    参数：name 数据表的名称
+    返回值：发生错误返回-1，不存在返回0，存在返回1
+```
 ### 切换数据库(在对数据库操作之前用该方法切换)
 ```c++
 int useDB(const std::string &name)
-    参数：name 数据表的名称
+    参数：name 数据库名称
     返回值：成功返回0，失败返回-1
 ```
 ### 切换数据表(在对数据表操作之前用该方法切换)
@@ -68,7 +80,7 @@ int createDB(const std::string &name);
 int upDB(const std::string &old_name, const std::string &new_name)
     参数：
         old_name 原来的数据库名称
-        new_name 要修改新的数据库名称
+        new_name 新的数据库名称
     返回值：成功返回0，失败返回-1
 ````
 ### 删除数据库
@@ -165,7 +177,7 @@ int createTable(const std::string &name, void (*createF)(dml *));
 ### 改表名称
 ````c++
 int upTable(const std::string &new_name)
-    参数：name 数据表名称
+    参数：name 新的数据表名称
     返回值：成功返回0，失败返回-1
 ````
 ### 删除数据表
@@ -252,7 +264,7 @@ int delIndex(const std::string &key)
 ### 插入数据
 ````c++
 int insert(const std::vector<std::array<std::string, 2>> &data)
-    参数: data 要被插入的数据 键值对
+    参数: data 要被插入的数据(键值对)
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
@@ -266,7 +278,7 @@ int insert(const std::vector<std::array<std::string, 2>> &data)
 int insert(const std::vector<std::string> &key,const std::vector<std::vector<std::string>> &value)
     参数:
         key 要插入数据的key数组
-        data 要被插入的数据集合每一段都要与key数组匹配
+        data 要被插入的数据集合，每一段都要与key数组匹配
     返回值：成功返回0，失败返回-1
     示例:
         dql a;
@@ -319,8 +331,9 @@ int show_()
 ### 获取指定字段的内容
 ````c++
 dql *select(const std::string &key = "*")
+    参数: key 只获取该定字段的内容(默认值*表示所有字段的内容)
 dql *selectArr(const std::vector<std::string> &key)
-    参数: key 只获取该字段下的内容
+    参数: key 只获取指定字段的内容(一组字段名称)
     返回值：返回一个指向自己的指针，可用于拼接如:update等功能
     示例:
         dql a;
@@ -348,8 +361,9 @@ dql *find(const unsigned long &id = 1)
 dql *where(const std::string &key, const std::string &value)
 dql *where(const std::string &key, const double &value)
     参数:
-        key
-        value
+        key 字段名(字符串型)
+        value 值(字符串 或 double数字类型)
+    说明: 获取指定key 下的value 相等的一类数据
     返回值：返回一个指向自己的指针，可用于拼接如:update等功能
     示例:
         dql a;
@@ -357,20 +371,24 @@ dql *where(const std::string &key, const double &value)
         a.useTable("aaa");
         //寻找a1等于aa的数据，进行删除
         a.where("a1","aa")->del();
-        //寻找a1等于aa并且a2等于123的数据，进行删除
-        a.where("a1","aa")->where("a2","123")->del();
-        a.where("a1",123)->where("a2",456)->show();
+        //寻找a1等于aa并且a2等于456的数据，进行查看
+        a.where("a1","aa")->where("a2",456)->show();
 ````
 ### where其它条件
 ````c++
 dql *where(const std::string &key, const std::string &symbols, const std::string &value)
 dql *where(const std::string &key, const std::string &symbols, const double &value)
     参数:
-        key
+        key 字段名(字符串型)
         symbols 支持的符号有: 大于(>)、小于(<)、等于(=)、大于等于(>=)、(<=)、(=)
-        value
+        value 值(double数字类型)
+    说明: 指定判断条件，如 id > 0 的一类数据
     返回值：返回一个指向自己的指针，可用于拼接如:update等功能
-    示例: a.where("a1",">",0)->show();
+    示例: 
+        dql a;
+        a.useDB("aaaaaa");
+        a.useTable("aaa");
+        a.where("a1",">",100)->where("a2","<",999)->show();
 ````
 ### notWhere主要用于值为null的正确获取
 ````c++
@@ -386,21 +404,39 @@ dql *orWhere(const std::string &key, const unsigned long &value)
 dql *orWhere(const std::string &key, const std::string &symbols, const std::string &value)
 dql *orWhere(const std::string &key, const std::string &symbols, const unsigned long &value)
 ````
-### 排序方式升序ASC，降序DESC
+### 排序方式
 ````c++
 dql *order(const std::string &key, const std::string &type = "ASC")
+    参数:
+        key 字段名(以该字段进行排序 如:id)
+        type 升序ASC，降序DESC
+    返回值：返回一个指向自己的指针 用于拼接其它功能
 ````
-### 查询key=start_value到end_value之间的数据，包含边界值
+### 区间查询，包含边界值
 ````c++
 dql *between(const std::string &key, const unsigned long &start_value, const unsigned long &end_value)
+    参数:
+        key 字段名(以该字段进行查找)
+        start_value 开始值
+        end_value 结束值
+    说明: 查询指定key下的内容，start_value到end_value之间的数据，包含边界值
+    返回值：返回一个指向自己的指针 用于拼接其它功能
 ````
-### 获取值为null的所有数据
+### 获取值为null的数据
 ````c++
 dql *isNull(const std::string &key)
+    参数:
+        key 字段名(以该字段进行查找)
+    说明: 查询指定key下的内容为null的数据
+    返回值：返回一个指向自己的指针 用于拼接其它功能
 ````
-### 获取值不为null的所有数据
+### 获取值不为null的数据
 ````c++
 dql *isNotNull(const std::string &key)
+    参数:
+        key 字段名(以该字段进行查找)
+    说明: 查询指定key下的内容不为null的数据
+    返回值：返回一个指向自己的指针 用于拼接其它功能
 ````
 ### like查找 %(匹配任意多个字符) _(匹配单一字符) \(转义)
 ````c++
@@ -430,18 +466,6 @@ int showIndex()
 ````c++
 int explain()
 ````
-### 判断数据库是否存在
-```c++
-int isDB(const std::string &name);
-    参数：name 数据库的名称
-    返回值：发生错误返回-1，不存在返回0，存在返回1
-```
-### 判断数据表是否存在
-```c++
-int isTable(const std::string &name);
-    参数：name 数据表的名称
-    返回值：发生错误返回-1，不存在返回0，存在返回1
-```
 ====
 ### mode
 > 继承dql(拥有它的所有方法)，以类名称创建数据库与数据表，通过mode类对mysql对应的数据库与数据表进行: 增、删、改、查  
