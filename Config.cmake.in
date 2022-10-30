@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+#用于检查路径是否合法
+set_and_check(@PROJECT_NAME@_INCLUDES "@PACKAGE_INCLUDES@")
+set_and_check(@PROJECT_NAME@_LIBS "@PACKAGE_LIBS@")
+set_and_check(@PROJECT_NAME@_CMAKE "@PACKAGE_CMAKE@")
+
+#引入安装生成信息
+include("@PACKAGE_CMAKE@/@PROJECT_NAME@Targets.cmake")
+
+#用于检查依赖项是否存在
+check_required_components(@PROJECT_NAME@)

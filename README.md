@@ -297,7 +297,7 @@ int update(const std::vector<std::array<std::string, 2>> &data)
         a.useDB("aaaaaa");
         a.useTable("aaa");
         //查找a1=aa的那一条数据，内容修改为:a2=bb，a3=cc
-        dql.where("a1","aa")->update({{"a2","456"},{"a3","666"}});
+        dql.where("a1","aa")->update({{"a2","bb"},{"a3","cc"}});
 ````
 ### 删除行(需要先定位数据然后对其删除)
 ````c++
