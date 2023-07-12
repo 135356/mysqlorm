@@ -1,4 +1,4 @@
-# MysqlOrm
+# MysqlOrm（已整合到 [135356/web_server](https://github.com/135356/web_server/releases) ）
 ###### Mysql数据库映射，如若有人关注会持续更新(需要先安装 *mysql 8* 在运行该项目)
 > 请到发布区 Releases 下载已经编译好的内容(支持全平台 windows、linux、ios)，解压 编辑./main.cpp 然后cmake编译 运行。如遇问题欢迎骚扰: x135356@sina.com
 ### 视频演示(1.0分支)
