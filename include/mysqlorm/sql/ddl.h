@@ -8,6 +8,8 @@
 #include <string>
 #include <cstring>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include "mysql.h"
 #include "bb/secure/Log.h"
 

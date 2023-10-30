@@ -4,6 +4,7 @@
 
 #ifndef MYSQLORM_DML_H
 #define MYSQLORM_DML_H
+#include <functional>
 #include "ddl.h"
 #include "dml_type.h"
 
