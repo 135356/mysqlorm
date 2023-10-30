@@ -8,8 +8,8 @@
 #include <string>
 #include <cstring>
 #include <thread>
-#include "bb/secure/Log.h"
 #include "mysql.h"
+#include "bb/secure/Log.h"
 
 namespace bb {
     class ddl {
@@ -17,7 +17,7 @@ namespace bb {
         ddl();
         ~ddl();
     protected:
-        std::string config_path_ = "./bb_mysql_orm_config.conf"; //配置文件
+        std::string config_path_ = "./bb_mysqlorm_config.conf"; //配置文件
         std::map<std::string, std::string> config_info_; //数据库的配置信息
         int initMysqlF();
     public:

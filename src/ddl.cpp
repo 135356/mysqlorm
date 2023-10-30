@@ -1,7 +1,7 @@
 //
 // Created by 邦邦 on 2022/4/20.
 //
-#include "mysql_orm/sql/ddl.h"
+#include "mysqlorm/sql/ddl.h"
 
 namespace bb {
     class ddl::MysqlPing_{
@@ -113,8 +113,8 @@ namespace bb {
     };
 
     ddl &ddl::obj(){
-        static ddl bb_mysql_orm_ddl;
-        return bb_mysql_orm_ddl;
+        static ddl obj;
+        return obj;
     }
 
     int ddl::initMysqlF() {

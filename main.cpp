@@ -2,10 +2,15 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "mysql_orm/mode/dbA1_test.hpp"
+#include "mysqlorm/mode/dbA1_test.hpp"
 #include "bb/secure/Log.h"
 
 int main(int, char**) {
+    dbA1_test::obj().insert("name:'aaa',age:1");
+    dbA1_test::obj().insert("name:'aaa',age:1");
+    dbA1_test::obj().insert("name:'aaa',age:1");
+    dbA1_test::obj().insert("name:'aaa',age:1");
+    dbA1_test::obj().select("name")->where("id>2")->show();
     /* dbA1_test::obj().insert("name:'aaa',age:1");
     dbA2_test::obj().insert("name:'bbb',age:1");
     dbA1_test::obj().insert("name:'aaa',age:1");

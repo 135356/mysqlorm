@@ -1,6 +1,6 @@
 // 2023 LongBang
 #pragma once
-#include "mysql_orm/sql/dql.h"
+#include "mysqlorm/sql/dql.h"
 
 class mode:public bb::dql{
 public:

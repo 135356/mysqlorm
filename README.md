@@ -1,10 +1,10 @@
 # MysqlOrm
 
 Mysql数据库映射，请先正确安装并运行 **mysql.8** 服务，如遇问题欢迎骚扰: <x135356@sina.com>
-> 发布区 [Releases](https://github.com/135356/MysqlOrm/releases) 有已经编译好的二进制文件
+> 发布区 [Releases](https://github.com/135356/mysqlorm/releases) 有已经编译好的二进制文件
 
 ### 基本信息配置文件
-> *./build/bb_mysql_orm_config.conf*
+> *./build/bb_mysqlorm_config.conf*
 
 ### 日志文件
 > *./build/bb.log*
@@ -13,7 +13,7 @@ Mysql数据库映射，请先正确安装并运行 **mysql.8** 服务，如遇�
 ````c++
 会根据创建的mode文件，自动生成相应的数据库与数据表（懒加载，只在调用mode文件时才会自动创建）
 名称定义：通过下划线分割数据库与数据表，并且大小写敏感(大写字母会生成下划线) 如: dbA1对应数据库db_a1，tbA1对应数据表tb_a1
-需要引入头文件 #include "mysql_orm/sql/mode.h"
+需要引入头文件 #include "mysqlorm/sql/mode.h"
 创建类并继承 "mode"
 
 构造函数：

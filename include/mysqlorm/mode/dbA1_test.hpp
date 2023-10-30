@@ -1,6 +1,6 @@
 // 2023 LongBang
 #pragma once
-#include "mysql_orm/sql/mode.h"
+#include "mysqlorm/sql/mode.h"
 
 class dbA1_test:public mode{
     dbA1_test(){

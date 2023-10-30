@@ -1,7 +1,7 @@
 //
 // Created by 邦邦 on 2022/4/18.
 //
-#include "mysql_orm/sql/dml_type.h"
+#include "mysqlorm/sql/dml_type.h"
 
 namespace bb {
     dml_type *dml_type::tinyint_(const std::string &key) {
