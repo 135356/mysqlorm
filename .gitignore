@@ -33,12 +33,9 @@
 
 # custom
 .DS_Store
-*.code-workspace
 .idea
-cmake-build-debug
 .cmake
+*.code-workspace
+cmake-build-debug
 CMakeFiles
-build/cmake_install.cmake
-build/CMakeCache.txt
-build/compile_commands.json
-build/Makefile
+build/

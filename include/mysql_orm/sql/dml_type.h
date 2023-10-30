@@ -7,7 +7,7 @@
 #include <vector>
 #include <array>
 #include <string>
-#include "bb/Log.h"
+#include "bb/secure/Log.h"
 
 namespace bb {
     class dml_type {
@@ -70,8 +70,16 @@ namespace bb {
         //文本类型 65,535 bytes
         dml_type *text_(const std::string &key);
 
-        //日期时间类型YYYY-MM-DD HH:MM:SS
+        //日期值类型YYYY-MM-DD
         dml_type *date_(const std::string &key);
+        //时间值或持续时间HH:MM:SS
+        dml_type *time_(const std::string &key);
+        //年份值YYYY
+        dml_type *year_(const std::string &key);
+        //混合日期和时间值YYYY-MM-DD HH:MM:SS
+        dml_type *datetime_(const std::string &key);
+        //混合日期和时间值，时间戳YYYYMMDD HHMMSS
+        dml_type *timestamp_(const std::string &key);
 
         //创建时间+更新时间
         dml_type *dateAt_();
@@ -79,7 +87,7 @@ namespace bb {
         //无符号的
         dml_type *unsigned_();
 
-        //唯一的
+        //唯一的(不允许重复)
         dml_type *unique_();
 
         //允许为null
