@@ -105,10 +105,16 @@ namespace bb {
         dml_type *zerofill_();
 
         //设置索引 全文索引只支持char、varchar和text
-        dml_type *index_(const short &is_unique = 0);
-
         dml_type *index_(const std::vector<std::string> &key_list, const short &is_unique = 0);
-
+        //普通索引
+        dml_type *index_();
+        //主键索引
+        dml_type *indexPrimaryKey_();
+        //全文索引
+        dml_type *indexFulltext_();
+        //唯一索引(只允许索引中的值对应一行，比如身份证号，而且当某个字段被指定为UNIQUE时会自动产生唯一索引)
+        dml_type *indexUnique_();
+        
         //设置非关系型数据索引
         dml_type *NoSQL_();
     };

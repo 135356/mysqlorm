@@ -219,34 +219,6 @@ namespace bb {
         return this;
     }
 
-    dml_type *dml_type::index_(const short &is_unique) {
-        //普通索引 CREATE TABLE t(c1 INT PRIMARY KEY,c2 INT NOT NULL,c3 INT NOT NULL,c4 VARCHAR(10),INDEX (c2,c3),UNIQUE INDEX(c4));
-        std::string sql;
-        switch (is_unique) {
-            case 0:
-                sql = "INDEX(`" + sql_arr_.back()[0] + "`)"; //普通索引
-                break;
-            case 1:
-                sql = "UNIQUE INDEX(`" + sql_arr_.back()[0] + "`)"; //唯一索引
-                break;
-            case 2:
-                sql = "FULLTEXT (`" + sql_arr_.back()[0] + "`)"; //全文索引
-                /*if(sql_arr_.back()[1].find("CHAR",0)!=std::string::npos||sql_arr_.back()[1].find("VARCHAR",0)!=std::string::npos||sql_arr_.back()[1].find("TEXT",0)!=std::string::npos){
-                    sql="FULLTEXT (`"+sql_arr_.back()[0]+"`)"; //全文索引
-                }else{
-                    throw bb::error("db:index_() 全文索引只支持 char、varchar和text");
-                }*/
-                break;
-            case 3:
-                sql = "PRIMARY KEY (`" + sql_arr_.back()[0] + "`)"; //主键索引
-                break;
-            default:
-                break;
-        }
-        sql_other_.push_back(sql);
-        return this;
-    }
-
     dml_type *dml_type::index_(const std::vector<std::string> &key_list, const short &is_unique) {
         std::string sql;
         for (auto &item: key_list) {
@@ -278,6 +250,29 @@ namespace bb {
         return this;
     }
 
+    dml_type *dml_type::index_() {
+        //普通索引 CREATE TABLE t(c1 INT PRIMARY KEY,c2 INT NOT NULL,c3 INT NOT NULL,c4 VARCHAR(10),INDEX (c2,c3),UNIQUE INDEX(c4));
+        sql_other_.push_back("INDEX(`" + sql_arr_.back()[0] + "`)");
+        return this;
+    }
+    dml_type *dml_type::indexPrimaryKey_(){
+        sql_other_.push_back("PRIMARY KEY (`" + sql_arr_.back()[0] + "`)");
+        return this;
+    }
+    dml_type *dml_type::indexFulltext_(){
+        /*if(sql_arr_.back()[1].find("CHAR",0)!=std::string::npos||sql_arr_.back()[1].find("VARCHAR",0)!=std::string::npos||sql_arr_.back()[1].find("TEXT",0)!=std::string::npos){
+            sql_other_.push_back("FULLTEXT (`"+sql_arr_.back()[0]+"`)");
+        }else{
+            throw bb::error("db:index_() 全文索引只支持 char、varchar和text");
+        }*/
+        sql_other_.push_back("FULLTEXT (`" + sql_arr_.back()[0] + "`)");
+        return this;
+    }
+    dml_type *dml_type::indexUnique_(){
+        sql_other_.push_back("UNIQUE INDEX(`" + sql_arr_.back()[0] + "`)");
+        return this;
+    }
+    
     dml_type *dml_type::NoSQL_() {
         sql_arr_.back()[5] = "1";
         return this;

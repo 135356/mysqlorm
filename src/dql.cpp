@@ -349,13 +349,6 @@ namespace bb {
     }
     
     dql *dql::get__(std::vector<std::map<std::string, std::string>> &data,const std::string &sql) {
-        std::string new_get_where_ = select_key_+where_sql_+order_sql_;
-        if(new_get_where_ == old_get_where_){
-            return this;
-        }else{
-            data = {};
-            old_get_where_ = new_get_where_;
-        }
         if (query_(sql) != 0) {
             return this;
         }
@@ -389,7 +382,13 @@ namespace bb {
     }
 
     dql *dql::get_(const std::string &sql) {
-        return get__(data_,sql);
+        std::string new_get_where_ = select_key_+where_sql_+order_sql_;
+        if(new_get_where_ == old_get_where_){ //如果条件一致，就没必要请求mysql
+            return this;
+        }else{
+            old_get_where_ = new_get_where_;
+            return get__(data_,sql);
+        }
     }
 
     int dql::get(std::string &result){
