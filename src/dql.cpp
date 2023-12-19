@@ -4,6 +4,14 @@
 #include "mysqlorm/sql/dql.h"
 
 namespace bb {
+    int dql::stringFilter_(const std::string &str){
+        for(auto &v:str){
+            if(v == ' ' || v == ';'){
+                return -1;
+            }
+        }
+        return 0;
+    }
     dql::dql():index_(ddl::obj().dql_index_) {
         if (ddl::obj().dql_index_ == ddl::obj().connect_.size() - 1) {
             ddl::obj().dql_index_ = 0;
@@ -180,8 +188,19 @@ namespace bb {
         }
         return this;
     }
+    dql *dql::orWhere(const std::string &key_value) {
+        where(key_value,2);
+        return this;
+    }
+    dql *dql::notWhere(const std::string &key_value) {
+        where(key_value,3);
+        return this;
+    }
 
     dql *dql::where(const std::string &key, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
         if (where_sql_.empty()) {
             where_sql_ = " WHERE `" + key + "`='" + value + '\'';
         } else {
@@ -189,20 +208,10 @@ namespace bb {
         }
         return this;
     }
-    dql *dql::where(const std::string &key, const std::string &symbols, const std::string &value) {
-        if (where_sql_.empty()) {
-            where_sql_ = " WHERE `" + key + "`" + symbols + '\'' + value + '\'';
-        } else {
-            where_sql_ += " AND `" + key + "`" + symbols + '\'' + value + '\'';
-        }
-        return this;
-    }
-
-    dql *dql::orWhere(const std::string &key_value) {
-        where(key_value,2);
-        return this;
-    }
     dql *dql::orWhere(const std::string &key, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
         if (where_sql_.empty()) {
             where_sql_ = " WHERE `" + key + "`='" + value + '\'';
         } else {
@@ -210,20 +219,10 @@ namespace bb {
         }
         return this;
     }
-    dql *dql::orWhere(const std::string &key, const std::string &symbols, const std::string &value) {
-        if (where_sql_.empty()) {
-            where_sql_ = " WHERE `" + key + "`" + symbols + '\'' + value + '\'';
-        } else {
-            where_sql_ += " OR `" + key + "`" + symbols + '\'' + value + '\'';
-        }
-        return this;
-    }
-    
-    dql *dql::notWhere(const std::string &key_value) {
-        where(key_value,3);
-        return this;
-    }
     dql *dql::notWhere(const std::string &key, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
         if (where_sql_.empty()) {
             where_sql_ = " WHERE NOT `" + key + "`='" + value + '\'';
         } else {
@@ -231,7 +230,33 @@ namespace bb {
         }
         return this;
     }
+
+    dql *dql::where(const std::string &key, const std::string &symbols, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
+        if (where_sql_.empty()) {
+            where_sql_ = " WHERE `" + key + "`" + symbols + '\'' + value + '\'';
+        } else {
+            where_sql_ += " AND `" + key + "`" + symbols + '\'' + value + '\'';
+        }
+        return this;
+    }
+    dql *dql::orWhere(const std::string &key, const std::string &symbols, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
+        if (where_sql_.empty()) {
+            where_sql_ = " WHERE `" + key + "`" + symbols + '\'' + value + '\'';
+        } else {
+            where_sql_ += " OR `" + key + "`" + symbols + '\'' + value + '\'';
+        }
+        return this;
+    }
     dql *dql::notWhere(const std::string &key, const std::string &symbols, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
         if (where_sql_.empty()) {
             where_sql_ = " WHERE NOT `" + key + "`" + symbols + '\'' + value + '\'';
         } else {
@@ -256,6 +281,9 @@ namespace bb {
     }
 
     dql *dql::like(const std::string &key, const std::string &value) {
+        if(stringFilter_(value) != 0){
+            return this;
+        }
         //WHERE name LIKE "$%" ESCAPE '$';  ##用$替代\(如:CONCAT("%", "\%", "%"))
         where_sql_ = " WHERE `" + key + "` LIKE '" + value + "'"; //'a%'(a开头),'%a%'(包含a),'a_'(a开头的,两个字)
         return this;

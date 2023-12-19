@@ -9,6 +9,8 @@
 namespace bb {
     class dql : public dml {
         std::string old_get_where_{}; //上一次查找条件
+        //字符串过滤，避免SQL注入攻击
+        int stringFilter_(const std::string &str);
     protected:
         unsigned index_{}; //负载均衡下标(不会被其它用户的构造影响)
         std::string select_key_ = "*";
@@ -33,16 +35,16 @@ namespace bb {
 
         //where
         dql *where(const std::string &key_symbols_value,const uint8_t &type=1);
-        dql *where(const std::string &key, const std::string &value);
-        dql *where(const std::string &key, const std::string &symbols, const std::string &value);
-        
         dql *orWhere(const std::string &key_value);
-        dql *orWhere(const std::string &key, const std::string &value);
-        dql *orWhere(const std::string &key, const std::string &symbols, const std::string &value);
-
         //主要用于值为null的正确获取
         dql *notWhere(const std::string &key_value);
+
+        dql *where(const std::string &key, const std::string &value);
+        dql *orWhere(const std::string &key, const std::string &value);
         dql *notWhere(const std::string &key, const std::string &value);
+
+        dql *where(const std::string &key, const std::string &symbols, const std::string &value);
+        dql *orWhere(const std::string &key, const std::string &symbols, const std::string &value);
         dql *notWhere(const std::string &key, const std::string &symbols, const std::string &value);
 
         //查询key=start_value到end_value之间的数据，包含边界值
