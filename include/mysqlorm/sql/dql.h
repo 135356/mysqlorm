@@ -9,8 +9,6 @@
 namespace bb {
     class dql : public dml {
         std::string old_get_where_{}; //上一次查找条件
-        //字符串过滤，避免SQL注入攻击
-        int stringFilter_(const std::string &str);
     protected:
         unsigned index_{}; //负载均衡下标(不会被其它用户的构造影响)
         std::string select_key_ = "*";
@@ -21,10 +19,13 @@ namespace bb {
         std::vector<std::map<std::string, std::string>> data_; //查询到的数据
         //向mysql发送数据
         int query_(const std::string &sql);
-    public:
         //model获取类的名称
         virtual void getName_(std::string &db_name,std::string &table_name);
-        
+        //将获取的数据std::vector<std::map<std::string, std::string>>转成字符串
+        int toStr_(std::vector<std::map<std::string, std::string>> &data,std::string &str);
+        //字符串过滤，避免SQL注入攻击
+        int stringFilter_(const std::string &str);
+    public:
         //获取指定的key
         dql *select(const std::string &key = "*");
 
@@ -61,7 +62,7 @@ namespace bb {
 
         //排序方式升序ASC，降序DESC
         dql *order(const std::string &key, const std::string &type = "ASC");
-    public:
+        
         //上一页，数据结构{aaa:{},bbb:[]}
         int limitLast(std::string &result,const unsigned &start_id,const unsigned &length = 100);
         int limitLast(std::string &result,const std::string &start_id,const std::string &length = "100"){
@@ -80,8 +81,6 @@ namespace bb {
             char *end=nullptr;
             return limitSpecific(result,strtol(page.c_str(),&end,10),strtol(length.c_str(),&end,10));
         }
-        //将获取的数据std::vector<std::map<std::string, std::string>>转成字符串
-        int toStr(std::vector<std::map<std::string, std::string>> &data,std::string &str);
         dql *get__(std::vector<std::map<std::string, std::string>> &data,const std::string &sql);
         //查询数据
         dql *get_(const std::string &sql);

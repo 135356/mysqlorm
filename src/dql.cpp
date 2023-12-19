@@ -4,14 +4,6 @@
 #include "mysqlorm/sql/dql.h"
 
 namespace bb {
-    int dql::stringFilter_(const std::string &str){
-        for(auto &v:str){
-            if(v == ' ' || v == ';'){
-                return -1;
-            }
-        }
-        return 0;
-    }
     dql::dql():index_(ddl::obj().dql_index_) {
         if (ddl::obj().dql_index_ == ddl::obj().connect_.size() - 1) {
             ddl::obj().dql_index_ = 0;
@@ -72,6 +64,33 @@ namespace bb {
                 }
             }
         }
+    }
+
+    int dql::toStr_(std::vector<std::map<std::string, std::string>> &data,std::string &str){
+        if (data.empty()) { return -1; }
+        for (auto &v: data) {
+            str += "{";
+            for (auto &vv: v) {
+                if (vv.second.empty()) {
+                    str += '"'+vv.first + "\":\" \",";
+                } else {
+                    str += '"'+vv.first + "\":\"" + vv.second + "\",";
+                }
+            }
+            str.pop_back();
+            str += "},";
+        }
+        str.pop_back();
+        str = '[' + str + ']';
+        return 0;
+    }
+    int dql::stringFilter_(const std::string &str){
+        for(auto &v:str){
+            if(v == ' ' || v == ';'){
+                return -1;
+            }
+        }
+        return 0;
     }
 
     dql *dql::select(const std::string &key) {
@@ -307,7 +326,7 @@ namespace bb {
             return -1;
         }else{
             std::reverse(data_.begin(), data_.end()); //将顺序反转一下
-            toStr(data_,str_data);
+            toStr_(data_,str_data);
             result = "{\"data\":"+str_data+"}";
             return 0;
         }
@@ -320,7 +339,7 @@ namespace bb {
         }
 
         result = {};std::string str_data{};
-        if(toStr(data_,str_data) == 0){
+        if(toStr_(data_,str_data) == 0){
             result = "{\"data\":"+str_data+"}";
             return 0;
         }else{
@@ -338,7 +357,7 @@ namespace bb {
         }
 
         result = {};std::string str_data{};
-        if(toStr(data_,str_data) == 0){
+        if(toStr_(data_,str_data) == 0){
             //翻页信息
             std::vector<std::map<std::string, std::string>> page_info;
             get__(page_info,"SELECT COUNT(id) as total FROM `" + table_name_ + '`'+where_sql_+';');
@@ -357,25 +376,6 @@ namespace bb {
         }
     }
 
-    int dql::toStr(std::vector<std::map<std::string, std::string>> &data,std::string &str){
-        if (data.empty()) { return -1; }
-        for (auto &v: data) {
-            str += "{";
-            for (auto &vv: v) {
-                if (vv.second.empty()) {
-                    str += '"'+vv.first + "\":\" \",";
-                } else {
-                    str += '"'+vv.first + "\":\"" + vv.second + "\",";
-                }
-            }
-            str.pop_back();
-            str += "},";
-        }
-        str.pop_back();
-        str = '[' + str + ']';
-        return 0;
-    }
-    
     dql *dql::get__(std::vector<std::map<std::string, std::string>> &data,const std::string &sql) {
         if (query_(sql) != 0) {
             return this;
@@ -414,6 +414,7 @@ namespace bb {
         if(new_get_where_ == old_get_where_){ //如果条件一致，就没必要请求mysql
             return this;
         }else{
+            data_={};
             old_get_where_ = new_get_where_;
             return get__(data_,sql);
         }
@@ -426,7 +427,7 @@ namespace bb {
             return -1;
         }
         result = {};
-        toStr(data_,result);
+        toStr_(data_,result);
         return 0;
     }
     std::vector<std::map<std::string, std::string>> &dql::get() {
