@@ -58,7 +58,7 @@ namespace bb {
         FILE *config_fp = fopen(config_path_.c_str(), "rb");
         if (!config_fp) {
             config_fp = fopen(config_path_.c_str(), "wb");
-            fputs((R"("host": "127.0.0.1","user": "root","password": "*","port": "3306","unix_socket": "","client_flag": "0","character":"GBK")"),config_fp);
+            fputs((R"("host": "127.0.0.1","user": "root","password": "*","port": "3306","unix_socket": "","client_flag": "0","character":"utf8mb4")"),config_fp);
             fclose(config_fp);
             secure::Log::obj().error("请配置基本信息:("+config_path_+")");
         }else{

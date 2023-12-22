@@ -11,8 +11,8 @@ Mysql数据库映射，请先正确安装并运行 **mysql.8** 服务，如遇�
 文件路径：./build/bb_mysqlorm_config.conf
 配置信息："host": "主机","user": "用户名","password": "密码","port": "端口号","unix_socket": "连接方式","client_flag": "标志位","character":"字符集"
 多台服务器换行配置另一台即可，示例(会根据操作类型轮循调用)：
-    "host": "127.0.0.1","user": "root","password": "123456","port": "3306","unix_socket": "","client_flag": "0","character":"GBK"
-    "host": "127.0.0.2","user": "root","password": "123456","port": "3306","unix_socket": "","client_flag": "0","character":"GBK"
+    "host": "127.0.0.1","user": "root","password": "123456","port": "3306","unix_socket": "","client_flag": "0","character":"utf8mb4"
+    "host": "127.0.0.2","user": "root","password": "123456","port": "3306","unix_socket": "","client_flag": "0","character":"utf8mb4"
 ````
 
 ### 日志文件
