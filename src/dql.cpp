@@ -1,69 +1,22 @@
-//
 // Created by 邦邦 on 2022/4/19.
-//
 #include "mysqlorm/sql/dql.h"
 
 namespace bb {
-    dql::dql():index_(ddl::obj().dql_index_) {
-        if (ddl::obj().dql_index_ == ddl::obj().connect_.size() - 1) {
+    dql::dql(){
+        long connect_arr_size = ddl::obj().connect_arr_.size();
+        if(connect_arr_size == 1){
             ddl::obj().dql_index_ = 0;
-        } else {
-            ddl::obj().dql_index_++;
+        }else{
+            if (ddl::obj().dql_index_ == connect_arr_size - 1) {
+                ddl::obj().dql_index_ = 0;
+            } else {
+                ddl::obj().dql_index_++;
+            }
         }
     }
 
     int dql::query_(const std::string &sql){
-        bb::ddl::obj().pingInitF_(); //初始化ping
-        if(DB_name_ != bb::ddl::obj().current_DB_name_){
-            bb::ddl::obj().current_DB_name_ = DB_name_;
-            std::string use_db_sql = "USE `" + DB_name_ + "`;";
-            if (mysql_query(&ddl::obj().connect_[index_], use_db_sql.c_str())) { //执行SQL语句:0 执行成功,1 执行失败，第二个参数只接受const cahr* 需要将string类型转化
-                bb::secure::Log::obj().warn(DB_name_+",进入数据库失败" + use_db_sql);
-                return -1;
-            }
-        }
-        if (mysql_query(&ddl::obj().connect_[index_],sql.c_str())) {
-            bb::secure::Log::obj().warn(DB_name_+",mysql_query 失败" + sql);
-            return -1;
-        }
-        return 0;
-    }
-
-    void dql::getName_(std::string &db_name,std::string &table_name) {
-        std::string class_name = typeid(*this).name();
-        //linux 前面会有一个数字表示类名称的长度
-        int i = 0;
-        for (; true; i++) {
-            if (class_name[i] >= '0' && class_name[i] <= '9') {
-            } else {
-                break;
-            }
-        }
-        //分割出库名称与表名称
-        bool head_is{};
-        for (; class_name[i] != '\0'; i++) {
-            if (class_name[i] == '_') {
-                head_is = true;
-                continue;
-            }
-            if (!head_is) {
-                if (class_name[i] >= 'A' && class_name[i] <= 'Z') {
-                    class_name[i] += 32; //转小写
-                    db_name += '_';
-                    db_name += class_name[i];
-                } else {
-                    db_name += class_name[i];
-                }
-            } else {
-                if (class_name[i] >= 'A' && class_name[i] <= 'Z') {
-                    class_name[i] += 32; //转小写
-                    table_name += '_';
-                    table_name += class_name[i];
-                } else {
-                    table_name += class_name[i];
-                }
-            }
-        }
+        return ddl::obj().getQueryF(DB_name_,sql);
     }
 
     int dql::toStr_(std::vector<std::map<std::string, std::string>> &data,std::string &str){
@@ -82,14 +35,6 @@ namespace bb {
         }
         str.pop_back();
         str = '[' + str + ']';
-        return 0;
-    }
-    int dql::stringFilter_(const std::string &str){
-        for(auto &v:str){
-            if(v == ' ' || v == ';'){
-                return -1;
-            }
-        }
         return 0;
     }
 
@@ -114,28 +59,36 @@ namespace bb {
 
     dql *dql::where(const std::string &key_symbols_value,const uint8_t &type) {
         std::string k_0,v_0,symbols{};
-        bool is_k=true,is_str_state=false,is_str_type=false;
-        long key_symbols_value_size = key_symbols_value.size();
-        std::vector<std::string> k_v_arr{};
-        std::vector<std::string> symbols_arr{};
+        bool is_k=true,is_str_type=false;
+        int8_t is_str_state{}; //大于0表示字符串类型开始
+        std::vector<std::string> k_v_arr{}; //键值对数组
+        std::vector<std::string> symbols_arr{}; //与或条件数组
 
+        //拼接键值对数组
         auto k_v_arrF = [&](const std::string &joint){
             if(is_str_type){
                 v_0 = '\''+v_0+'\'';
             }
             k_v_arr.push_back('`' + k_0 + '`' + symbols + v_0);
             symbols_arr.push_back(joint);
-            is_k=true,is_str_state=false,is_str_type=false;
+            is_k=true,is_str_type=false;
             k_0=v_0=symbols={};
         };
 
+        long key_symbols_value_size = key_symbols_value.size();
         for(uint32_t i=0;i<key_symbols_value_size;i++){
             if(is_k){
-                if(key_symbols_value[i] == '>' || key_symbols_value[i] == '<' || key_symbols_value[i] == '=' || key_symbols_value[i] == '!'){
+                if(key_symbols_value[i] == '>' || key_symbols_value[i] == '<' || key_symbols_value[i] == '!'){
                     symbols += key_symbols_value[i];
                     if(key_symbols_value[i+1] == '='){
                         i++;
                         symbols += key_symbols_value[i];
+                    }
+                    is_k = false;
+                }else if(key_symbols_value[i] == '='){
+                    symbols += key_symbols_value[i];
+                    if(key_symbols_value[i+1] == '='){
+                        i++;
                     }
                     is_k = false;
                 }else if(key_symbols_value[i] != ' ' && key_symbols_value[i] != ';'){
@@ -143,15 +96,21 @@ namespace bb {
                 }
             }else{
                 if(key_symbols_value[i] == '\''){
-                    if(is_str_state){
-                        is_str_state = false;
-                    }else{
-                        is_str_state = is_str_type = true;
+                    if(is_str_state == 0){
+                        is_str_state = 1;
+                        is_str_type = true;
+                    }else if(is_str_state == 1){
+                        is_str_state = 0;
+                    }
+                }else if(key_symbols_value[i] == '"'){
+                    if(is_str_state == 0){
+                        is_str_state = 2;
+                        is_str_type = true;
+                    }else if(is_str_state == 2){
+                        is_str_state = 0;
                     }
                 }else{
-                    if(is_str_state){
-                        v_0 += key_symbols_value[i];
-                    }else{
+                    if(is_str_state == 0){
                         if(key_symbols_value[i] == '&'){
                             if(key_symbols_value[i+1] == '&'){
                                 i++;
@@ -165,14 +124,23 @@ namespace bb {
                         }else if(key_symbols_value[i] != ' ' && key_symbols_value[i] != ';'){
                             v_0 += key_symbols_value[i];
                         }
+                    }else{
+                        v_0 += key_symbols_value[i];
                     }
                 }
             }
         }
-        if(!v_0.empty()){
-            k_v_arrF("AND");
+        if(is_str_state == 0){
+            //如果只有一个条件，字符串里面是不包含&&与||的
+            if(!v_0.empty()){
+                k_v_arrF("");
+            }
+        }else{
+            //字符串没有封口可能存在恶意行为
+            bb::secure::Log::obj().warn(DB_name_+",is_str_state错误");
+            return this;
         }
-
+        
         long k_v_arr_size = k_v_arr.size();
         if(k_v_arr_size > 0){
             switch(type){
@@ -217,9 +185,7 @@ namespace bb {
     }
 
     dql *dql::where(const std::string &key, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         if (where_sql_.empty()) {
             where_sql_ = " WHERE `" + key + "`='" + value + '\'';
         } else {
@@ -228,9 +194,7 @@ namespace bb {
         return this;
     }
     dql *dql::orWhere(const std::string &key, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         if (where_sql_.empty()) {
             where_sql_ = " WHERE `" + key + "`='" + value + '\'';
         } else {
@@ -239,9 +203,7 @@ namespace bb {
         return this;
     }
     dql *dql::notWhere(const std::string &key, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         if (where_sql_.empty()) {
             where_sql_ = " WHERE NOT `" + key + "`='" + value + '\'';
         } else {
@@ -251,9 +213,7 @@ namespace bb {
     }
 
     dql *dql::where(const std::string &key, const std::string &symbols, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         if (where_sql_.empty()) {
             where_sql_ = " WHERE `" + key + "`" + symbols + '\'' + value + '\'';
         } else {
@@ -262,9 +222,7 @@ namespace bb {
         return this;
     }
     dql *dql::orWhere(const std::string &key, const std::string &symbols, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         if (where_sql_.empty()) {
             where_sql_ = " WHERE `" + key + "`" + symbols + '\'' + value + '\'';
         } else {
@@ -273,9 +231,7 @@ namespace bb {
         return this;
     }
     dql *dql::notWhere(const std::string &key, const std::string &symbols, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         if (where_sql_.empty()) {
             where_sql_ = " WHERE NOT `" + key + "`" + symbols + '\'' + value + '\'';
         } else {
@@ -300,9 +256,7 @@ namespace bb {
     }
 
     dql *dql::like(const std::string &key, const std::string &value) {
-        if(stringFilter_(value) != 0){
-            return this;
-        }
+        if(bb::ddl::obj().strFilterF(value) != 0){return this;}
         //WHERE name LIKE "$%" ESCAPE '$';  ##用$替代\(如:CONCAT("%", "\%", "%"))
         where_sql_ = " WHERE `" + key + "` LIKE '" + value + "'"; //'a%'(a开头),'%a%'(包含a),'a_'(a开头的,两个字)
         return this;
@@ -381,7 +335,7 @@ namespace bb {
             return this;
         }
         MYSQL_RES *res; //返回行的一个查询结果集
-        if (!(res = mysql_store_result(&ddl::obj().connect_[index_]))) {
+        if (!(res = mysql_store_result(&ddl::obj().connect_arr_[ddl::obj().dql_index_].mysql))) {
             bb::secure::Log::obj().warn("mysql_store_result 失败" + sql);
             return this;
         }
@@ -476,12 +430,12 @@ namespace bb {
         return get_(sql)->show_();
     }
 
-    int dql::isDB(const std::string &name) {
+    int dql::isDB() {
         int state{};
-        if (query_("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '" + name + "';") == -1) {
+        if (query_("SELECT SCHEMA_NAME FROM information_schema.SCHEMATA WHERE SCHEMA_NAME = '" + DB_name_ + "';") == -1) {
             state = -1;
         } else {
-            MYSQL_RES *res = mysql_store_result(&ddl::obj().connect_[0]); //返回行的一个查询结果集
+            MYSQL_RES *res = mysql_store_result(&ddl::obj().connect_arr_[0].mysql); //返回行的一个查询结果集
             if (res && res->data->rows) {
                 state = 1;
             }
@@ -490,13 +444,13 @@ namespace bb {
         return state;
     }
 
-    int dql::isTable(const std::string &name) {
-        if (query_("SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = '" + name + "';") == -1) {
+    int dql::isTable() {
+        if (query_("SELECT * FROM information_schema.TABLES WHERE TABLE_NAME = '" + table_name_ + "';") == -1) {
             return -1;
         }
 
         int state{};
-        MYSQL_RES *res = mysql_store_result(&ddl::obj().connect_[0]); //返回行的一个查询结果集
+        MYSQL_RES *res = mysql_store_result(&ddl::obj().connect_arr_[0].mysql); //返回行的一个查询结果集
         if (res && res->data->rows) {
             MYSQL_ROW row;
             while ((row = mysql_fetch_row(res))) {
@@ -512,24 +466,28 @@ namespace bb {
     }
 
     int dql::update(const std::string &data) {
-        bool is_k=true,is_str_state=false,is_str_type=false;
         std::string k_0, v_0, k_v{};
-        int32_t value_i{};
-        for(auto &v:data){
-            value_i++;
-            if(v == '\''){
-                if(!is_str_state){
-                    is_str_state = is_str_type = true;
-                }else{
-                    if(data[value_i] == ','){
-                        is_str_state = false;
-                    }
+        int8_t is_str_state{}; //大于0表示字符串类型开始
+        bool is_k=true,is_str_type=false;
+        int64_t data_size = data.size();
+        for(uint32_t i=0;i<data_size;i++){
+            if(data[i] == '\''){
+                if(is_str_state == 0){
+                    is_str_state = 1;
+                    is_str_type = true;
+                }else if(is_str_state == 1){
+                    is_str_state = 0;
+                }
+            }else if(data[i] == '"'){
+                if(is_str_state == 0){
+                    is_str_state = 2;
+                    is_str_type = true;
+                }else if(is_str_state == 2){
+                    is_str_state = 0;
                 }
             }else{
-                if(is_str_state){
-                    v_0 += v;
-                }else{
-                    if(v == ','){
+                if(is_str_state == 0){
+                    if(data[i] == ','){
                         k_v += '`' + k_0 + "`=";
                         if(is_str_type){
                             k_v += '\'' + v_0 + "\',";
@@ -538,33 +496,41 @@ namespace bb {
                         }
                         is_k=true;is_str_type=false;
                         k_0 = v_0 = {};
-                    }else if(v == ':'){
+                    }else if(data[i] == ':'){
                         if(is_k){
                             is_k = false;
                         }
-                    }else{
+                    }else if(data[i] != ' ' && data[i] != ';'){
                         if(is_k){
-                            k_0 += v;
+                            k_0 += data[i];
                         }else{
-                            v_0 += v;
+                            v_0 += data[i];
                         }
                     }
+                }else{
+                    v_0 += data[i];
                 }
             }
         }
         
-        if(!v_0.empty()){
-            k_v += '`' + k_0 + "`=";
-            if(is_str_type){
-                k_v += '\'' + v_0 + "\',";
-            }else{
-                k_v += v_0 + ',';
+        int is{};
+        if(is_str_state == 0){
+            if(!v_0.empty()){
+                k_v += '`' + k_0 + "`=";
+                if(is_str_type){
+                    k_v += '\'' + v_0 + "\',";
+                }else{
+                    k_v += v_0 + ',';
+                }
+
+                k_v.pop_back();
             }
-
-            k_v.pop_back();
+            is = ddl::obj().upQueryF(DB_name_,"UPDATE `" + table_name_ + "` SET " + k_v + where_sql_ + ';');
+        }else{
+            is = -1;
+            //字符串没有封口可能存在恶意行为
+            bb::secure::Log::obj().warn(DB_name_+",is_str_state错误");
         }
-
-        int is = dml::query_("UPDATE `" + table_name_ + "` SET " + k_v + where_sql_ + ';');
         where_sql_ = "";
         return is;
     }
@@ -572,16 +538,17 @@ namespace bb {
     int dql::update(const std::vector<std::array<std::string, 2>> &data) {
         std::string k_v;
         for (auto &item: data) {
+            if(bb::ddl::obj().strFilterF(item[1]) != 0){return -1;}
             k_v += '`' + item[0] + "`=" + '\'' + item[1] + "\',";
         }
         k_v.pop_back();
-        int is = dml::query_("UPDATE `" + table_name_ + "` SET " + k_v + where_sql_ + ';');
+        int is = ddl::obj().upQueryF(DB_name_,"UPDATE `" + table_name_ + "` SET " + k_v + where_sql_ + ';');
         where_sql_ = "";
         return is;
     }
 
     int dql::del() {
-        int is = dml::query_("DELETE FROM `" + table_name_ + '`' + where_sql_ + ';');
+        int is = ddl::obj().upQueryF(DB_name_,"DELETE FROM `" + table_name_ + '`' + where_sql_ + ';');
         where_sql_ = "";
         return is;
     }

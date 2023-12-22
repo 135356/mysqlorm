@@ -1,9 +1,6 @@
 // 数据类型
 // Created by 邦邦 on 2022/4/18.
-//
-
-#ifndef MYSQLORM_DML_TYPE_H
-#define MYSQLORM_DML_TYPE_H
+#pragma once
 #include <vector>
 #include <array>
 #include <string>
@@ -119,5 +116,3 @@ namespace bb {
         dml_type *NoSQL_();
     };
 }
-
-#endif //MYSQLORM_DML_TYPE_H

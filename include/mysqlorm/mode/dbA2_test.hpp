@@ -2,24 +2,24 @@
 #pragma once
 #include "mysqlorm/sql/mode.h"
 
-class dbA1_test:public mode{
+class dbA2_test:public mode{
 public:
     //单例模式(!)
     static auto &obj(){
-        static dbA1_test obj;
+        static dbA2_test obj;
         obj.initSqlF_();
         return obj;
     }
 private:
     //构造函数(!)
-    dbA1_test(){
+    dbA2_test(){
         //字段名称，如：名称、年龄、性别，按顺序依次申明
         key_ = {
             "name",
             "age",
             "sex"
         };
-        //这里是初始化，初始化成功之后将根据mode的名称如(dbA1_test)，自动生成一个db_a1数据库 与 test数据表
+        //这里是初始化，初始化成功之后将根据mode的名称如(dbA2_test)，自动生成一个db_a1数据库 与 test数据表
         if(initializationF_() != 0){
             bb::secure::Log::obj().error("mode创建的时候出现问题");
         }

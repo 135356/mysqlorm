@@ -1,34 +1,30 @@
 // 查询
 // Created by 邦邦 on 2022/4/18.
-//
-
-#ifndef MYSQLORM_DQL_H
-#define MYSQLORM_DQL_H
-#include "dml.h"
+#pragma once
+#include <string>
+#include <vector>
+#include <map>
+#include "ddl.h"
 
 namespace bb {
-    class dql : public dml {
+    class dql{
         std::string old_get_where_{}; //上一次查找条件
     protected:
-        unsigned index_{}; //负载均衡下标(不会被其它用户的构造影响)
         std::string select_key_ = "*";
         std::string where_sql_ = {};
         std::string order_sql_ = {};
     public:
         explicit dql();
+        std::string DB_name_; //库名称
+        std::string table_name_; //表名称
         std::vector<std::map<std::string, std::string>> data_; //查询到的数据
         //向mysql发送数据
         int query_(const std::string &sql);
-        //model获取类的名称
-        virtual void getName_(std::string &db_name,std::string &table_name);
         //将获取的数据std::vector<std::map<std::string, std::string>>转成字符串
         int toStr_(std::vector<std::map<std::string, std::string>> &data,std::string &str);
-        //字符串过滤，避免SQL注入攻击
-        int stringFilter_(const std::string &str);
     public:
         //获取指定的key
         dql *select(const std::string &key = "*");
-
         dql *selectArr(const std::vector<std::string> &key);
 
         //以id获取
@@ -102,10 +98,10 @@ namespace bb {
         int explain();
 
         //判断数据库是否存在
-        int isDB(const std::string &name);
+        int isDB();
 
         //判断数据表是否存在
-        int isTable(const std::string &name);
+        int isTable();
 
         //改一行(符合条件的一行数据)
         int update(const std::string &data);
@@ -115,5 +111,3 @@ namespace bb {
         int del();
     };
 }
-
-#endif //MYSQLORM_DQL_H

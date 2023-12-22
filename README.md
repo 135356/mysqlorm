@@ -3,8 +3,17 @@
 Mysql数据库映射，请先正确安装并运行 **mysql.8** 服务，如遇问题欢迎骚扰: <x135356@sina.com>
 > 发布区 [Releases](https://github.com/135356/mysqlorm/releases) 有已经编译好的二进制文件
 
+### 依赖关系
+> [135356/bb](https://github.com/135356/bb) 包含线程池、tcp长链接、http协议解析、文件管理、日志系统、字符加解密
+
 ### 基本信息配置文件
-> *./build/bb_mysqlorm_config.conf*
+````c++
+文件路径：./build/bb_mysqlorm_config.conf
+配置信息："host": "主机","user": "用户名","password": "密码","port": "端口号","unix_socket": "连接方式","client_flag": "标志位","character":"字符集"
+多台服务器换行配置另一台即可，示例(会根据操作类型轮循调用)：
+    "host": "127.0.0.1","user": "root","password": "123456","port": "3306","unix_socket": "","client_flag": "0","character":"GBK"
+    "host": "127.0.0.2","user": "root","password": "123456","port": "3306","unix_socket": "","client_flag": "0","character":"GBK"
+````
 
 ### 日志文件
 > *./build/bb.log*
@@ -21,9 +30,8 @@ Mysql数据库映射，请先正确安装并运行 **mysql.8** 服务，如遇�
     在构造函数里面调用 initializationF_() 初始化（初始化成功返回0，失败返回-1，初始化成功之后将根据mode的名称，如 dbA1_test，自动生成一个 db_a1数据库 与 test数据表）
 
 数据表创建函数：
-    int createTable(const std::string &table_name,std::function<void(dml *)> createF)
+    int createTable(std::function<void(dml *)> createF)
     参数说明：
-        table_name 数据表的名称(自动判断，默认为table_name_，不要随意变动)
         createF 回调函数
             整型数据：第一个参数为字段名，第二个参数可指定显示长度(需配合ZEROFILL使用)
                 tinyint_("name") 很小的整数(1字节,-128〜127 | 0〜255)
@@ -171,7 +179,17 @@ int get(std::string &result)
 ### 示例
 #### 创建(./mode/dbA1_test.hpp)文件
 ````c++
+    #include "mysqlorm/sql/mode.h"
     class dbA1_test:public mode{
+    public:
+        //单例模式(!)
+        static auto &obj(){
+            static dbA1_test obj;
+            obj.initSqlF_();
+            return obj;
+        }
+    private:
+        //构造函数(!)
         dbA1_test(){
             //字段名称，如：名称、年龄、性别，按顺序依次申明
             key_ = {
@@ -183,17 +201,13 @@ int get(std::string &result)
             if(initializationF_() != 0){
                 bb::secure::Log::obj().error("mode创建的时候出现问题");
             }
-            updateF_();
-        }
-    public:
-        static dbA1_test &obj(){
-            static dbA1_test obj;
-            return obj;
+            //删除数据库数据表
+            //updateF_();
         }
     protected:
         //创建表
         int createTableF_(){
-            return createTable(table_name_,[this](auto *data){
+            return createTable([this](auto *data){
                 data->string_(key_[0])->comment_("用户名");
                 data->int_(key_[1])->nullable_()->comment_("年龄");
                 data->string_(key_[2])->nullable_()->comment_("性别");
@@ -201,7 +215,15 @@ int get(std::string &result)
             });
         }
         //更新
-        void updateF_(){}
+        void updateF_(){
+            if(delTable() != 0){
+                bb::secure::Log::obj().error(DB_name_+",数据表删除失败");
+            }
+            if(delDB() != 0){
+                bb::secure::Log::obj().error(DB_name_+",数据库删除失败");
+            }
+            bb::secure::Log::obj().info("更新完成请退出程序，并注释掉更新代码");
+        }
     };
 ````
 
