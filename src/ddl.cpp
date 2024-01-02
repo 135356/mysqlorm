@@ -12,7 +12,7 @@ namespace bb {
             th_ = std::thread([this] {
                 while(!stop_){
                     std::unique_lock<std::mutex> lck(mtx_);
-                    time_cv_.wait_for(lck, std::chrono::seconds(28680),[&](){ //阻塞n秒后ping一次，保持mysql的连接(mysql会28800秒后断开链接)
+                    time_cv_.wait_for(lck, std::chrono::seconds(ddl::obj().connect_timeout),[&](){ //阻塞n秒后ping一次，保持mysql的连接(mysql会28800秒后断开链接)
                         return flag_;
                     });
                     if(flag_){
@@ -58,9 +58,9 @@ namespace bb {
         FILE *config_fp = fopen(config_path_.c_str(), "rb");
         if (!config_fp) {
             config_fp = fopen(config_path_.c_str(), "wb");
-            fputs((R"("host": "127.0.0.1","user": "root","password": "*","port": "3306","unix_socket": "","client_flag": "0","character":"utf8mb4")"),config_fp);
+            fputs((R"("host": "127.0.0.1","user": "root","password": "*","port": "3306","unix_socket": "","client_flag": "0","character":"utf8mb4","read_timeout":"30","write_timeout":"60")"),config_fp);
             fclose(config_fp);
-            secure::Log::obj().error("请配置基本信息:("+config_path_+")");
+            secure::Log::obj().error("请配置文件:("+config_path_+")");
         }else{
             getConfigF_(config_fp);
             fclose(config_fp);
@@ -137,9 +137,29 @@ namespace bb {
         MysqlPing_::obj().initF();
     };
     int ddl::initMysqlF_(Connect_ &mysql_obj){
+        //设置连接超时时间，单位秒
+        if(mysql_options(&mysql_obj.mysql, MYSQL_OPT_CONNECT_TIMEOUT, std::to_string(connect_timeout).c_str()) != 0){
+            secure::Log::obj().warn("设置连接超时时间错误！");
+            return -1;
+        }
+        //设置读取超时时间，单位秒
+        if(mysql_options(&mysql_obj.mysql, MYSQL_OPT_READ_TIMEOUT, mysql_obj.info["read_timeout"].c_str()) != 0){
+            secure::Log::obj().warn("设置读取超时时间错误！");
+            return -1;
+        }
+        //设置写入超时时间，单位秒
+        if(mysql_options(&mysql_obj.mysql, MYSQL_OPT_WRITE_TIMEOUT, mysql_obj.info["write_timeout"].c_str()) != 0){
+            secure::Log::obj().warn("设置写入超时时间错误！");
+            return -1;
+        }
+        //设置字符集
+        if(mysql_options(&mysql_obj.mysql, MYSQL_SET_CHARSET_NAME, mysql_obj.info["character"].c_str()) != 0){
+            secure::Log::obj().warn("设置字符集错误！");
+            return -1;
+        }
         //初始化
         if(!mysql_init(&mysql_obj.mysql)){
-            secure::Log::obj().warn("mysql初始化失败,主机:" + mysql_obj.info["host"]);
+            secure::Log::obj().warn("mysql初始化失败 主机:" + mysql_obj.info["host"]);
             return -1;
         }
         //连接
@@ -154,13 +174,8 @@ namespace bb {
                 std::stoi(mysql_obj.info["client_flag"])
             )
         ){
-            secure::Log::obj().warn("数据库连接失败，错误"+(std::string)mysql_error(&mysql_obj.mysql));
+            secure::Log::obj().warn("数据库连接失败:"+(std::string)mysql_error(&mysql_obj.mysql));
             mysql_close(&mysql_obj.mysql);
-            return -1;
-        }
-        //设置字符集
-        if(mysql_set_character_set(&mysql_obj.mysql,mysql_obj.info["character"].c_str())){
-            secure::Log::obj().warn("字符集设置错误！");
             return -1;
         }
         return 0;
@@ -169,7 +184,7 @@ namespace bb {
         //进行初始化
         for(auto &v:connect_arr_){
             if(v.info["password"] == "*"){
-                secure::Log::obj().error("请配置基本信息:("+config_path_+")");
+                secure::Log::obj().error("请配置文件:("+config_path_+")");
                 return -1;
             }else if(initMysqlF_(v) != 0){
                 return -1;
@@ -198,12 +213,13 @@ namespace bb {
             current_DB_name_ = DB_name;
             std::string use_db_sql = "USE `" + DB_name + "`;";
             if (mysql_query(&connect_arr_[dql_index_].mysql, use_db_sql.c_str()) != 0) { //执行SQL语句:0 执行成功,1 执行失败，第二个参数只接受const cahr* 需要将string类型转化
-                secure::Log::obj().warn(DB_name+",进入数据库失败" + use_db_sql);
+                secure::Log::obj().warn(DB_name+"::进入数据库失败" + (std::string)mysql_error(&connect_arr_[dql_index_].mysql));
                 return -1;
             }
         }
         if (mysql_query(&connect_arr_[dql_index_].mysql,sql.c_str()) != 0) {
-            secure::Log::obj().warn(DB_name+",mysql_query 失败" + sql);
+            secure::Log::obj().warn(DB_name+"::mysql_query 失败" + (std::string)mysql_error(&connect_arr_[dql_index_].mysql));
+            indexUpF();
             return -1;
         }
         return 0;
@@ -224,12 +240,13 @@ namespace bb {
             if(is_use_db){
                 std::string use_db_sql = "USE `" + DB_name + "`;";
                 if (mysql_query(&v.mysql, use_db_sql.c_str()) != 0) {
-                    secure::Log::obj().warn(DB_name+",进入数据库失败" + use_db_sql);
+                    secure::Log::obj().warn(DB_name+"::进入数据库失败:" + (std::string)mysql_error(&v.mysql));
                     return -1;
                 }
             }
             if (mysql_query(&v.mysql, sql.c_str()) != 0) {
-                secure::Log::obj().warn(DB_name+",mysql_query 失败" + sql);
+                secure::Log::obj().warn(DB_name+"::mysql_query 失败:" + (std::string)mysql_error(&v.mysql));
+                indexUpF();
                 return -1;
             }
         }

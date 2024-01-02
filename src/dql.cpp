@@ -3,16 +3,7 @@
 
 namespace bb {
     dql::dql(){
-        long connect_arr_size = ddl::obj().connect_arr_.size();
-        if(connect_arr_size == 1){
-            ddl::obj().dql_index_ = 0;
-        }else{
-            if (ddl::obj().dql_index_ == connect_arr_size - 1) {
-                ddl::obj().dql_index_ = 0;
-            } else {
-                ddl::obj().dql_index_++;
-            }
-        }
+        ddl::obj().indexUpF();
     }
 
     int dql::query_(const std::string &sql){
