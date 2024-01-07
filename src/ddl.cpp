@@ -89,14 +89,7 @@ namespace bb {
             if(c == EOF){
                 break;
             }else if(c == '\r' || c == '\n'){
-                if(is_str_state == 0){
-                    if(!key_0.empty()){
-                        connect.info[key_0] = str_0;
-                        is_k=true;key_0 = str_0 = {};
-                        connect_arr_.push_back(connect);
-                    }
-                }
-                return getConfigF_(config_fp);
+                getConfigF_(config_fp);break;
             }else if(c == '\''){
                 if(is_str_state == 0){
                     is_str_state = 1;
@@ -205,6 +198,18 @@ namespace bb {
             }
         }
         return 0;
+    }
+    void ddl::indexUpF(){
+        long connect_arr_size = connect_arr_.size();
+        if(connect_arr_size == 1){
+            dql_index_ = 0;
+        }else{
+            if (dql_index_ == connect_arr_size - 1) {
+                dql_index_ = 0;
+            } else {
+                dql_index_++;
+            }
+        }
     }
     int ddl::getQueryF(const std::string &DB_name,const std::string &sql){
         pingInitF_(); //初始化ping

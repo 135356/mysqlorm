@@ -28,23 +28,12 @@ namespace bb {
         static ddl &obj(); //单例
         //字符串过滤，避免SQL注入攻击
         int strFilterF(const std::string &str);
+        //下标加一
+        void indexUpF();
         //获取语句的发送
         int getQueryF(const std::string &DB_name,const std::string &sql);
         //修改语句的发送
         int upQueryF(const std::string &DB_name,const std::string &sql,bool is_use_db=true);
-        //下标加一
-        void indexUpF(){
-            long connect_arr_size = ddl::obj().connect_arr_.size();
-            if(connect_arr_size == 1){
-                ddl::obj().dql_index_ = 0;
-            }else{
-                if (ddl::obj().dql_index_ == connect_arr_size - 1) {
-                    ddl::obj().dql_index_ = 0;
-                } else {
-                    ddl::obj().dql_index_++;
-                }
-            }
-        }
     protected:
         std::string config_path_ = "./bb_mysqlorm_config.conf"; //配置文件
         std::string current_DB_name_; //当前库名称
