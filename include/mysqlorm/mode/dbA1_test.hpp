@@ -6,9 +6,9 @@ class dbA1_test:public mode{
 public:
     //单例模式(!)
     static auto &obj(){
-        static dbA1_test obj;
-        obj.initSqlF_();
-        return obj;
+        static dbA1_test alias;
+        alias.initSqlF_();
+        return alias;
     }
 private:
     //构造函数(!)

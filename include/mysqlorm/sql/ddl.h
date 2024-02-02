@@ -23,7 +23,7 @@ namespace bb {
         ~ddl();
     public:
         int8_t dql_index_=-1; //负载均衡下标,轮询切换服务器,只有DQL需要切换,只在new的时候切换
-        int16_t connect_timeout = 28750; //连接超时时间
+        int16_t connect_timeout = 28800; //连接超时时间
         std::vector<Connect_> connect_arr_{}; //mysql长链接与配置信息
         static ddl &obj(); //单例
         //字符串过滤，避免SQL注入攻击
@@ -37,6 +37,7 @@ namespace bb {
     protected:
         std::string config_path_ = "./bb_mysqlorm_config.conf"; //配置文件
         std::string current_DB_name_; //当前库名称
+        std::set<char> str_filter_arr_{' ',';','\'','"'}; //需要过滤的字符
         //获取配置信息
         void getConfigF_(FILE *config_fp);
         //子线程ping的超时 时间初始化

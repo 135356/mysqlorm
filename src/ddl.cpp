@@ -12,7 +12,7 @@ namespace bb {
             th_ = std::thread([this] {
                 while(!stop_){
                     std::unique_lock<std::mutex> lck(mtx_);
-                    time_cv_.wait_for(lck, std::chrono::seconds(ddl::obj().connect_timeout),[&](){ //阻塞n秒后ping一次，保持mysql的连接(mysql会28800秒后断开链接)
+                    time_cv_.wait_for(lck, (std::chrono::seconds(ddl::obj().connect_timeout-30)),[&](){ //阻塞n秒后ping一次，保持mysql的连接(mysql会28800秒后断开链接)
                         return flag_;
                     });
                     if(flag_){
@@ -192,7 +192,7 @@ namespace bb {
     }
     int ddl::strFilterF(const std::string &str){
         for(auto &v:str){
-            if(v == ' ' || v == ';' || v == '\'' || v == '"'){
+            if(str_filter_arr_.count(v) > 0){
                 secure::Log::obj().warn("字符串包含非法字符");
                 return -1;
             }
