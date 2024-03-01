@@ -53,10 +53,10 @@ namespace bb {
         //删除索引
         int delIndex(const std::string &key);
     public:
-        //插入数据：insert("a1:'abc',a2:123");
+        //插入数据：insert("name:'小明',age:10");
         int insert(const std::string &value);
         int insert(const std::vector<std::string> &key,const std::string &value);
-        //插入数据：insert("a1,a2","'abc',123"); 或批量插入数据：insert("a1,a2","'abc',123;'def',456);
+        //插入数据：insert("name,age","'小明',10"); 或批量插入数据：insert("name,age","'小明',10;'大明',20);
         int insert(const std::string &key,const std::string &value);
 
         //插入数据{{"键1","值1"},{"k2","v2"}}

@@ -2,7 +2,7 @@ get_filename_component(project_name_ ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 string(TOLOWER ${project_name_} project_name_)
 cmake_minimum_required(VERSION 3.0)
 set(CMAKE_CXX_STANDARD 20)
-project(${project_name_} VERSION 4.0.0)
+project(${project_name_} VERSION 6.2.0)
 ADD_DEFINITIONS(-D_PROJECT_VERSION=\"${PROJECT_VERSION}\")
 
 #Debug｜Release模式: -g表示带调试信息，-Wall表示输出所有的警告信息
@@ -21,8 +21,8 @@ else()
     add_library(${PROJECT_NAME} STATIC ${SRC_FILE})
 endif()
 set(CMAKE_PREFIX_PATH ${install_dir}/cmake/modules)
-find_package(mysql REQUIRED NO_MODULE)
-find_package(bb 6.0 REQUIRED NO_MODULE)
+find_package(mysql REQUIRED NO_MODULE) #注意它的位置是/usr/local
+find_package(bb 6.2 REQUIRED NO_MODULE)
 include_directories(${mysql_INCLUDES} ${bb_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include> $<INSTALL_INTERFACE:include>)
 

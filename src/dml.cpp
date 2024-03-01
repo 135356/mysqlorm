@@ -1,5 +1,6 @@
 // Created by 邦邦 on 2022/4/19.
 #include "mysqlorm/sql/dml.h"
+#include <string>
 
 namespace bb {
     int dml::query_(const std::string &sql,bool is_use_db){
@@ -198,7 +199,8 @@ namespace bb {
                         }else{
                             v_0_arr += v_0 + ',';
                         }
-                        is_k=true;is_str_type=false;
+                        is_k=true;
+                        is_str_type=false;
                         k_0 = v_0 = {};
                     }else if(value[i] == ':'){
                         if(is_k){
@@ -230,6 +232,7 @@ namespace bb {
             v_0_arr.pop_back();
             k_0_arr = '(' + k_0_arr + ')';
             v_0_arr = '(' + v_0_arr + ')';
+            //std::string aaa = "INSERT INTO `" + table_name_ + "` " + k_0_arr + " VALUES " + v_0_arr + ";";printf("aaa:%s\n",aaa.c_str());return 1;
             return query_("INSERT INTO `" + table_name_ + "` " + k_0_arr + " VALUES " + v_0_arr + ";");
         }else{
             //字符串没有封口可能存在恶意行为
@@ -246,13 +249,24 @@ namespace bb {
         k_str.pop_back();
         k_str = '(' + k_str + ')';
 
-        uint32_t k_size=key.size(),v_size{}; //如果部分字段没有值，就要将没有值对应的字段赋值null，否则报错
-        int8_t is_str_state{};  //大于0表示字符串类型开始
+        int8_t is_str_state{};  //大于0表示字符串类型的开始
+        uint32_t k_size=key.size(),v_size{}; //用于最后一个字段补null
         bool is_str_type=false; //对应的内容是否字符串
         std::string v_str; //单个值
         std::string v_arr_1; //一组值
         std::string v_arr_n; //多组值
         int64_t value_size = value.size();
+        auto v_arrF = [](bool &is_str_type,std::string &v_str,std::string &v_arr_1){
+            if(v_str.empty()){
+                v_str = "null";
+            }
+            if(is_str_type){
+                v_arr_1 += '\'' + v_str + "\',";
+            }else{
+                v_arr_1 += v_str + ',';
+            }
+            is_str_type=false;v_str = {};
+        };
         for(uint32_t i=0;i<value_size;i++){
             if(value[i] == '\''){
                 if(is_str_state == 0){
@@ -270,23 +284,19 @@ namespace bb {
                 }
             }else{
                 if(is_str_state == 0){
-                    if(value[i] == ',' || value[i] == ';'){
+                    if(value[i] == ','){
                         v_size++;
-                        if(is_str_type){
-                            v_arr_1 += '\'' + v_str + "\',";
-                        }else{
-                            v_arr_1 += v_str + ',';
+                        v_arrF(is_str_type,v_str,v_arr_1);
+                    }else if(value[i] == ';'){
+                        v_size++;
+                        v_arrF(is_str_type,v_str,v_arr_1);
+                        for(int i=0;i<k_size - v_size;i++){
+                            v_arr_1 += "null,";
                         }
-                        is_str_type=false;v_str = {};
-                        if(value[i] == ';'){
-                            for(int i=0;i<k_size - v_size;i++){
-                                v_arr_1 += "null,";
-                            }
-                            v_arr_1.pop_back();
-                            v_arr_1 = '(' + v_arr_1 + "),";
-                            v_arr_n += v_arr_1;
-                            v_size = {};v_arr_1 = {};
-                        }
+                        v_arr_1.pop_back();
+                        v_arr_1 = '(' + v_arr_1 + "),";
+                        v_arr_n += v_arr_1;
+                        v_size = {};v_arr_1 = {};
                     }else if(value[i] != ' '){
                         v_str += value[i];
                     }
@@ -296,13 +306,9 @@ namespace bb {
             }
         }
         if(is_str_state == 0){
-            if(!v_str.empty()){
+            if(v_size){
                 v_size++;
-                if(is_str_type){
-                    v_arr_1 += '\'' + v_str + "\',";
-                }else{
-                    v_arr_1 += v_str + ',';
-                }
+                v_arrF(is_str_type,v_str,v_arr_1);
                 for(int i=0;i<k_size - v_size;i++){
                     v_arr_1 += "null,";
                 }
@@ -328,7 +334,7 @@ namespace bb {
                 v_arr_1 = '(' + v_arr_1 + ')';
             }
         }
-        
+        //std::string aaa = "INSERT INTO `" + table_name_ + "` " + k_str + " VALUES " + v_arr_1 + ";";printf("aaa:%s\n",aaa.c_str());return 1;
         return query_("INSERT INTO `" + table_name_ + "` " + k_str + " VALUES " + v_arr_1 + ";");
     }
 
