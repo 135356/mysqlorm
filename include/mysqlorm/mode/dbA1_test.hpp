@@ -28,9 +28,9 @@ protected:
     //创建表
     int createTableF_(){
         return createTable([this](auto *data){
-            data->string_(key_[0])->nullable_()->comment_("用户名");
-            data->int_(key_[1])->nullable_()->comment_("年龄");
-            data->int_(key_[2])->nullable_()->comment_("性别");
+            data->string_(key_[0])->comment_("用户名"); //string类型不允许为空，comment表示注释
+            data->int_(key_[1])->nullable_()->comment_("年龄"); //int类型，nullable表示允许为空
+            data->int_(key_[2])->nullable_()->comment_("性别"); //同上
             data->dateAt_(); //用户最近一次修改信息的时间、用户最初注册的时间
         });
     }
